@@ -4,14 +4,14 @@ var G = {};
 
 G.texturesToLoad = [
  
-  ['gold'   , 'img/iri/gold.png'],
-  ['turq'   , 'img/iri/red.png'],
+  ['gold'   , 'img/iri/comboWet.png'],
+  ['turq'   , 'img/iri/neonYellowPurp.png'],
 
   //['sand'  , 'img/normals/moss_normal_map.jpg' ],
 //  ['sand'  , 'img/normals/sand.png' ],
-  ['sand'  , 'img/normals/chesterfield.png' ],
+  ['sand'  , 'img/normals/other.jpg' ],
   //['sand'  , 'img/normals/carbonFiber.png' ],
-  ['text'  , 'img/tielsie.png' ],
+  ['text'  , 'img/boy.png' ],
 
 ]
 
