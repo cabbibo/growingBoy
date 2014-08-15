@@ -69,8 +69,6 @@ G.clock         = new THREE.Clock();
 
 G.position      = new THREE.Vector3();
 
-G.controls  = new THREE.TrackballControls( G.camera );
-
 G.camera.position.relative = new THREE.Vector3().copy( G.camera.position );
 
 G.container     = document.getElementById('container' );
@@ -154,11 +152,123 @@ G.init = function(){
   G.GEOS[ 'icosahedron' ]  = new THREE.IcosahedronGeometry( 1 , 2 );
   G.MATS[ 'normal'      ]  = new THREE.MeshNormalMaterial();
 
+  var rHandMesh = new THREE.Mesh( 
+    new THREE.BoxGeometry( 10 , 10, 100 ),
+    new THREE.MeshBasicMaterial( 0xff0000 )
+  );
+ 
+
+  var smallMesh = new THREE.Mesh(
+    new THREE.IcosahedronGeometry( 1 , 2 ),
+    new THREE.MeshBasicMaterial({color:0xffffff})
+
+  );
+  this.rHand = new RiggedSkeleton( this.leap , this.camera , {
+  
+    movementSize: 1000,
+    handSize:     100,
+
+  });
+  
+ // this.rHand.addScaledMeshToAll( rHandMesh );
+
+  //this.rHand.hand.add( smallMesh );
+  this.rHand.addToScene( this.scene );
+
+  this.rHand.relative = new THREE.Vector3();
+
+
+
+
+  var lHandMesh = new THREE.Mesh( 
+    new THREE.BoxGeometry( 10 , 10, 100 ),
+    new THREE.MeshBasicMaterial( 0xff0000 )
+  );
+ 
+  this.lHand = new RiggedSkeleton( this.leap , this.camera ,  {
+  
+    movementSize: 1000,
+    handSize:     100,
+
+  });
+  
+  //this.lHand.addScaledMeshToAll( rHandMesh );
+
+  var sm = smallMesh.clone();
+  this.lHand.hand.add( sm );
+  this.lHand.addToScene( this.scene );
+
+  this.lHand.relative = new THREE.Vector3();
+
+  console.log( 'HAND' );
+  console.log( this.lHand );
+
+    
+  this.objectControls = new ObjectControls( 
+    this.camera , 
+    this.rHand.hand , 
+    this.leap  
+  );
+
+  this.mouse = this.objectControls.unprojectedMouse;
+  this.raycaster = this.objectControls.raycaster;
 
 }
 
 
+G.updateIntersection = function(){
 
+  if( this.iPlane.faceCamera == true ){
+    
+    this.iPlane.position.copy( this.camera.position );
+    var vector = new THREE.Vector3( 0 , 0 , -this.iPlaneDistance );
+    vector.applyQuaternion( this.camera.quaternion );
+    this.iPlane.position.add( vector );
+    this.iPlane.lookAt( this.camera.position );
+
+    this.iObj.lookAt( this.camera.position );
+
+  }else{
+
+    G.tmpV3.set( 0 , 0 , 1 );
+    G.tmpV3.applyQuaternion( this.iPlane.quaternion );
+
+    var lookat =this.iObj.position.clone().add( G.tmpV3 );
+
+    this.iObj.lookAt( lookat ); 
+
+  }
+
+
+  G.tmpV3.copy( this.mouse );
+
+  if( this.objectControls.leap === true ){
+
+    G.tmpV3.copy(this.rHand.hand.position);
+ 
+  }
+  
+  G.tmpV3.sub( this.camera.position );
+  G.tmpV3.normalize();
+
+  
+  this.raycaster.set( this.camera.position ,  G.tmpV3 );
+
+  var intersects = this.raycaster.intersectObject( this.iPlane );
+
+  if( intersects.length > 0 ){
+  
+    this.iPoint.copy( intersects[0].point );
+    this.iPoint.relative.copy( this.iPoint );
+    this.iPoint.relative.sub( this.position );
+    this.iDir.copy( G.tmpV3 );
+   // bait.position.copy( intersects[0].point );
+  }else{
+    //console.log('NOT HITTING IPLANE!');
+  }
+
+
+}
 
 G.animate = function(){
 
@@ -171,12 +281,27 @@ G.animate = function(){
 
     this.tween.update();
 
-
+    this.objectControls.update();
+    this.updateIntersection();
 
     this.audio.update();
 
+    this.rHand.update( 0 );
+    this.lHand.update( 1 );
 
-    this.controls.update();
+
+    this.rHand.relative.copy( this.rHand.hand.position );
+    this.rHand.relative.sub( this.position );
+    
+    this.lHand.relative.copy( this.lHand.hand.position );
+    this.lHand.relative.sub( this.position );
+
+    this.iPoint.relative.copy( this.iPoint );
+    this.iPoint.relative.sub( this.position );
+   
+    this.camera.position.relative.copy( this.camera.position );
+    this.camera.position.relative.sub( this.position );
+
  
     this.stats.update();
     this.renderer.render( this.scene , this.camera );
