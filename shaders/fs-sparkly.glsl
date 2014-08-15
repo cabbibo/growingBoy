@@ -42,7 +42,7 @@ void main(){
   float distance = title.a;
   float lum = smoothstep( 0.6 - smoothing , 0.6 + smoothing , distance );
 
-  vec2 newNorm = vec2( 3. , 3. ) * lum;
+  vec2 newNorm = vec2( 20. , 20. ) * lum;
 
   vec3 q0 = dFdx( vPos.xyz );
   vec3 q1 = dFdy( vPos.xyz );
@@ -53,12 +53,9 @@ void main(){
   vec3 T = normalize( -q0 * st1.s + q1 * st0.s );
   vec3 N = normalize( vNorm );
 
-  vec2 offset = vec2(  timer * .012 , timer * .01345 );
-  vec2 offset2 = vec2(  -timer * .012 , timer * .01345 );
+  vec2 offset = vec2(  timer * .12 , timer * .1345 );
+  vec2 offset2 = vec2(  -timer * .12 , timer * .1345 );
 
-
-
- 
   vec3 mapN = texture2D( t_normal,vUv*texScale+offset).xyz * 2.0 - 1.0;
   mapN += texture2D( t_normal,vUv*texScale+offset2).xyz * 2.0 - 1.0;
 
@@ -84,20 +81,18 @@ void main(){
 
   vec3 a = texture2D( t_audio , vec2( abs(sin(dot( -vLightDir , fNorm )*1.)) , 0. ) ).xyz;
 
-  a *= abs(vec3( sin( a.x * 1. ) , sin( a.y * 1. ), sin( a.z * 1. ) )); 
-  a *= a*a*a*a;
  // a = normalize( a );
   vec3 iri = texture2D( t_iri , vec2( abs(sin(reflFR*reflFR*10.)) , 0. ) ).xyz;
 
   totalIri +=  iri ;
 
-   iri = texture2D( t_iriFace , vec2( abs(sin(fr*10.)) , 0. ) ).xyz;
+  iri = texture2D( t_iriFace , vec2( abs(sin(fr*10.)) , 0. ) ).xyz;
 
      
-    totalIri +=  iri;
+  totalIri +=  iri;
 
    
-    vec3 f =texture2D( t_iriFace , vec2( reflFR *  reflFR * reflFR , 0. ) ).xyz;
+  vec3 f =texture2D( t_iriFace , vec2( reflFR *  reflFR * reflFR , 0. ) ).xyz;
 
  // totalIri += a;
 
@@ -113,9 +108,10 @@ void main(){
 
 
 
+  vec3 cExtra = vec3( abs(sin( reflFR * 10. )) , abs( sin( fr * 20. ) ) , abs( cos( a.x  * 100.)) );
 
   //gl_FragColor = vec4( totalIri * aFR  , fOpacity );
-  gl_FragColor = vec4(totalIri * aFR  , fOpacity );
+  gl_FragColor = vec4(totalIri * aFR  * a * cExtra , fOpacity );
  // gl_FragColor = vec4( tLookup.x , 0. , tLookup.y , 1. );
  // gl_FragColor = title;//vec4( tLookup.x , 0. , tLookup.y , 1. );
 
