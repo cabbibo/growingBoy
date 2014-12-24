@@ -24,6 +24,8 @@ $simplex
 vec3 noisePos( vec3 pos , vec2 offset , float cutoff ){
 
   float multiplier = snoise( pos.xy * vec2( bumpSize , bumpSize * .7 ) + offset);
+  ///multiplier += .1 * snoise( pos.xy * vec2( bumpSize * 3. , bumpSize * 3. ) + .01 *offset);
+
 
   vec3 p = pos + vec3( 0 , 0 , 1 ) *( multiplier+1.) * bumpHeight; // * cutoff;
 

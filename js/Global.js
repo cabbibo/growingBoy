@@ -10,7 +10,7 @@ G.texturesToLoad = [
   //['sand'  , 'img/normals/moss_normal_map.jpg' ],
  ['sand'  , 'img/normals/sand.png' ],
   //['sand'  , 'img/normals/waternormals.jpg' ],
-  //['sand'  , 'img/normals/waternormals.jpg' ],
+ // ['sand'  , 'img/normals/waternormals.jpg' ],
   //['sand'  , 'img/normals/carbonFiber.png' ],
   ['text'  , 'img/boy.png' ],
 
